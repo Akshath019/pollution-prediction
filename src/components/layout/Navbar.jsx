@@ -6,7 +6,7 @@ const Navbar = () => {
   const location = useLocation();
 
   const navItems = [
-    { path: "/", label: "Dashboard", icon: Activity },
+    { path: "/dashboard", label: "Dashboard", icon: Activity },
     { path: "/timeline", label: "Timeline", icon: Clock },
     { path: "/attribution", label: "Factor Attribution", icon: BarChart3 },
     { path: "/simulator", label: "What-If", icon: Sliders },
@@ -20,7 +20,7 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 backdrop-blur-xl bg-black/50">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo - Links to HOME now */}
           <Link to="/" className="flex items-center space-x-3 group">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-shadow">
               <Activity className="w-6 h-6 text-white" />
