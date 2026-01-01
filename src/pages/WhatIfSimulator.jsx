@@ -16,6 +16,12 @@ import {
   TrendingDown,
   TrendingUp,
   Lightbulb,
+  Car,
+  Factory,
+  Wind,
+  Droplets,
+  Trees,
+  Thermometer,
 } from "lucide-react";
 import {
   BarChart,
@@ -31,7 +37,6 @@ import {
 const WhatIfSimulator = () => {
   const { featureImportance, predictions, loading, error } = usePollutionData();
 
-  // Get baseline prediction (first hour)
   const baselinePollution =
     predictions && predictions.length > 0
       ? predictions[0].pollution_prediction ||
@@ -39,7 +44,6 @@ const WhatIfSimulator = () => {
         56
       : 56;
 
-  // Factor adjustments (percentage changes)
   const [factors, setFactors] = useState({
     traffic_volume: 0,
     congestion_index: 0,
@@ -52,10 +56,8 @@ const WhatIfSimulator = () => {
   const [simulatedPollution, setSimulatedPollution] =
     useState(baselinePollution);
 
-  // Calculate impact based on feature importance
   const getFeatureWeight = (featureName) => {
     if (!featureImportance || featureImportance.length === 0) {
-      // Default weights if no data
       const defaults = {
         traffic_volume: 0.35,
         congestion_index: 0.2,
@@ -74,27 +76,22 @@ const WhatIfSimulator = () => {
     return feature ? feature.importance_percentage / 100 || 0.1 : 0.1;
   };
 
-  // Recalculate pollution when factors change
   useEffect(() => {
     let adjustedPollution = baselinePollution;
 
-    // Apply each factor's impact
     Object.keys(factors).forEach((factorName) => {
       const change = factors[factorName];
       const weight = getFeatureWeight(factorName);
 
-      // Green space and wind speed reduce pollution (inverse relationship)
       const multiplier =
         factorName === "green_space_percentage" || factorName === "wind_speed"
           ? -1
           : 1;
 
-      // Impact = baseline * weight * percentage_change * direction
       const impact = baselinePollution * weight * (change / 100) * multiplier;
       adjustedPollution += impact;
     });
 
-    // Keep within reasonable bounds
     adjustedPollution = Math.max(0, Math.min(300, adjustedPollution));
     setSimulatedPollution(adjustedPollution);
   }, [factors, baselinePollution, featureImportance]);
@@ -143,7 +140,6 @@ const WhatIfSimulator = () => {
   const pollutionChange = simulatedPollution - baselinePollution;
   const percentageChange = (pollutionChange / baselinePollution) * 100;
 
-  // Get AQI category
   const getCategory = (value) => {
     if (value <= 50) return "Good";
     if (value <= 100) return "Moderate";
@@ -154,7 +150,6 @@ const WhatIfSimulator = () => {
 
   const currentCategory = getCategory(simulatedPollution);
 
-  // Comparison data for chart
   const comparisonData = [
     {
       name: "Baseline",
@@ -168,33 +163,49 @@ const WhatIfSimulator = () => {
     },
   ];
 
-  // Factor configurations
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-gray-900 border border-white/30 rounded-lg p-4 shadow-2xl">
+          <p className="text-white font-semibold text-sm mb-2">
+            {payload[0].payload.name}
+          </p>
+          <p className="text-blue-400 font-bold text-2xl">
+            {payload[0].value.toFixed(1)}
+          </p>
+          <p className="text-white/60 text-xs mt-1">AQI Level</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   const factorConfigs = [
     {
       key: "traffic_volume",
       label: "Traffic Volume",
-      icon: "🚗",
+      icon: Car,
       description: "Adjust vehicle count on roads",
       color: "blue",
     },
     {
       key: "congestion_index",
       label: "Traffic Congestion",
-      icon: "🚦",
+      icon: Car,
       description: "How congested are the roads",
       color: "orange",
     },
     {
       key: "industrial_activity",
       label: "Industrial Activity",
-      icon: "🏭",
+      icon: Factory,
       description: "Factory and industrial emissions",
       color: "red",
     },
     {
       key: "wind_speed",
       label: "Wind Speed",
-      icon: "💨",
+      icon: Wind,
       description: "Higher wind disperses pollution",
       color: "cyan",
       inverse: true,
@@ -202,7 +213,7 @@ const WhatIfSimulator = () => {
     {
       key: "green_space_percentage",
       label: "Green Spaces",
-      icon: "🌳",
+      icon: Trees,
       description: "Parks and vegetation coverage",
       color: "green",
       inverse: true,
@@ -210,7 +221,7 @@ const WhatIfSimulator = () => {
     {
       key: "temperature",
       label: "Temperature",
-      icon: "🌡️",
+      icon: Thermometer,
       description: "Ambient temperature",
       color: "yellow",
     },
@@ -219,209 +230,168 @@ const WhatIfSimulator = () => {
   return (
     <div className="min-h-screen bg-black pt-24 pb-12 px-4">
       <div className="container mx-auto max-w-7xl space-y-8">
-        {/* Header */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white">
-                What-If Simulator
-              </h1>
-              <p className="text-white/60 text-lg">
-                Interactive tool to explore pollution scenarios
-              </p>
-            </div>
-            <button
-              onClick={resetFactors}
-              className="flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors border border-white/20"
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span>Reset</span>
-            </button>
+        {/* Header with Reset Button */}
+        <div className="flex items-start justify-between">
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-5xl font-bold text-white">
+              What-If Simulator
+            </h1>
+            <p className="text-white/60 text-lg">
+              Interactive tool to explore pollution scenarios
+            </p>
           </div>
+          <button
+            onClick={resetFactors}
+            className="flex items-center space-x-2 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-all border border-red-500/30 font-semibold"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>Reset All</span>
+          </button>
         </div>
 
         {/* Info Banner */}
         <Card className="bg-gradient-to-r from-purple-950/50 to-blue-950/50 border-purple-500/20">
           <CardContent className="pt-6">
             <div className="flex items-start space-x-4">
-              <div className="p-2 bg-purple-500/20 rounded-lg">
-                <Lightbulb className="w-5 h-5 text-purple-400" />
+              <div className="p-3 bg-purple-500/20 rounded-lg">
+                <Lightbulb className="w-6 h-6 text-purple-400" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-white mb-1">
-                  How to Use
+                <h3 className="text-xl font-bold text-white mb-2">
+                  How to Use This Simulator
                 </h3>
-                <p className="text-white/70 text-sm">
-                  Adjust the sliders below to simulate different scenarios. See
-                  how reducing traffic, increasing green spaces, or changing
-                  weather conditions affects pollution levels in real-time.
+                <p className="text-white/70">
+                  Adjust the factor sliders below to simulate different policy
+                  scenarios. Watch how reducing traffic, increasing green
+                  spaces, or changing weather conditions affects pollution
+                  levels in real-time. Use the quick scenario buttons for common
+                  policy actions.
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left: Controls */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="bg-black/50 border-white/10 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="text-white">Adjust Factors</CardTitle>
-                <CardDescription className="text-white/60">
-                  Move sliders to simulate changes (-50% to +50%)
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {factorConfigs.map((config) => {
-                  const value = factors[config.key];
-                  return (
-                    <div key={config.key} className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <span className="text-2xl">{config.icon}</span>
-                          <div>
-                            <p className="text-white font-medium">
-                              {config.label}
-                            </p>
-                            <p className="text-white/40 text-xs">
-                              {config.description}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <span
-                            className={`text-lg font-bold ${
-                              value === 0
-                                ? "text-white/60"
-                                : value > 0
-                                ? "text-red-400"
-                                : "text-green-400"
-                            }`}
-                          >
-                            {value > 0 ? "+" : ""}
-                            {value}%
-                          </span>
-                        </div>
-                      </div>
-                      <Slider
-                        value={[value]}
-                        onValueChange={(val) =>
-                          handleFactorChange(config.key, val)
-                        }
-                        min={-50}
-                        max={50}
-                        step={5}
-                        className="cursor-pointer"
-                      />
-                      <div className="flex justify-between text-xs text-white/40">
-                        <span>-50% (Reduce)</span>
-                        <span>0% (Baseline)</span>
-                        <span>+50% (Increase)</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-          </div>
+        {/* Main Layout: Results on Top, Controls Below */}
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* LEFT: Current vs Simulated Result */}
+          <Card
+            className={`bg-gradient-to-br ${
+              pollutionChange > 10
+                ? "from-red-950/50 to-black border-red-500/30"
+                : pollutionChange < -10
+                ? "from-green-950/50 to-black border-green-500/30"
+                : "from-blue-950/50 to-black border-blue-500/30"
+            } backdrop-blur-xl`}
+          >
+            <CardHeader>
+              <CardTitle className="text-white text-2xl">
+                Simulation Results
+              </CardTitle>
+              <CardDescription className="text-white/60">
+                Predicted pollution level with your adjustments
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                {/* Baseline */}
+                <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30">
+                  <p className="text-blue-400 text-sm font-medium mb-2">
+                    Baseline (Current)
+                  </p>
+                  <p className="text-5xl font-bold text-white">
+                    {baselinePollution.toFixed(1)}
+                  </p>
+                  <p className="text-white/60 text-sm mt-2">AQI Index</p>
+                </div>
 
-          {/* Right: Results */}
-          <div className="space-y-6">
-            {/* Main Result Card */}
-            <Card
-              className={`bg-gradient-to-br ${
-                pollutionChange > 10
-                  ? "from-red-950/50 to-black border-red-500/20"
-                  : pollutionChange < -10
-                  ? "from-green-950/50 to-black border-green-500/20"
-                  : "from-blue-950/50 to-black border-blue-500/20"
-              }`}
-            >
-              <CardHeader>
-                <CardTitle className="text-white text-lg">
-                  Simulated Pollution
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-6xl font-bold text-white mb-2">
-                      {simulatedPollution.toFixed(1)}
-                    </p>
-                    <Badge
-                      className={`${getAQIColor(currentCategory)} text-white`}
-                    >
-                      {currentCategory}
-                    </Badge>
-                  </div>
+                {/* Simulated */}
+                <div
+                  className={`p-4 rounded-xl ${
+                    pollutionChange > 0
+                      ? "bg-red-500/10 border border-red-500/30"
+                      : "bg-green-500/10 border border-green-500/30"
+                  }`}
+                >
+                  <p
+                    className={`text-sm font-medium mb-2 ${
+                      pollutionChange > 0 ? "text-red-400" : "text-green-400"
+                    }`}
+                  >
+                    Simulated Result
+                  </p>
+                  <p className="text-5xl font-bold text-white">
+                    {simulatedPollution.toFixed(1)}
+                  </p>
+                  <Badge
+                    className={`${getAQIColor(
+                      currentCategory
+                    )} text-white mt-2`}
+                  >
+                    {currentCategory}
+                  </Badge>
+                </div>
+              </div>
 
-                  <div className="pt-4 border-t border-white/10 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-white/60 text-sm">
-                        Change from baseline
-                      </span>
-                      <div
-                        className={`flex items-center space-x-2 ${
-                          pollutionChange > 0
-                            ? "text-red-400"
-                            : "text-green-400"
-                        }`}
-                      >
-                        {pollutionChange > 0 ? (
-                          <TrendingUp className="w-4 h-4" />
-                        ) : (
-                          <TrendingDown className="w-4 h-4" />
-                        )}
-                        <span className="font-bold">
-                          {pollutionChange > 0 ? "+" : ""}
-                          {pollutionChange.toFixed(1)}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-white/60 text-sm">
-                        Percentage change
-                      </span>
-                      <span
-                        className={`font-bold ${
-                          pollutionChange > 0
-                            ? "text-red-400"
-                            : "text-green-400"
-                        }`}
-                      >
-                        {percentageChange > 0 ? "+" : ""}
-                        {percentageChange.toFixed(1)}%
-                      </span>
-                    </div>
+              {/* Change Metrics */}
+              <div className="space-y-3 pt-4 border-t border-white/10">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                  <span className="text-white/80 font-medium">
+                    Absolute Change
+                  </span>
+                  <div
+                    className={`flex items-center space-x-2 ${
+                      pollutionChange > 0 ? "text-red-400" : "text-green-400"
+                    }`}
+                  >
+                    {pollutionChange > 0 ? (
+                      <TrendingUp className="w-5 h-5" />
+                    ) : (
+                      <TrendingDown className="w-5 h-5" />
+                    )}
+                    <span className="font-bold text-xl">
+                      {pollutionChange > 0 ? "+" : ""}
+                      {pollutionChange.toFixed(1)} AQI
+                    </span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Comparison Chart */}
-            <Card className="bg-black/50 border-white/10 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="text-white text-lg">
-                  Before vs After
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-48">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                  <span className="text-white/80 font-medium">
+                    Percentage Change
+                  </span>
+                  <span
+                    className={`font-bold text-xl ${
+                      pollutionChange > 0 ? "text-red-400" : "text-green-400"
+                    }`}
+                  >
+                    {percentageChange > 0 ? "+" : ""}
+                    {percentageChange.toFixed(1)}%
+                  </span>
+                </div>
+              </div>
+
+              {/* Comparison Chart */}
+              <div className="pt-4">
+                <p className="text-white/80 font-semibold mb-4">
+                  Before vs After Comparison
+                </p>
+                <div className="h-64 p-4 rounded-xl bg-gray-900/50 border border-white/10">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={comparisonData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
                       <XAxis
                         dataKey="name"
-                        stroke="#ffffff40"
-                        tick={{ fill: "#ffffff60" }}
+                        stroke="#ffffff60"
+                        tick={{ fill: "#ffffff90", fontSize: 14 }}
                       />
-                      <YAxis stroke="#ffffff40" tick={{ fill: "#ffffff60" }} />
+                      <YAxis
+                        stroke="#ffffff60"
+                        tick={{ fill: "#ffffff90", fontSize: 14 }}
+                      />
                       <Tooltip
-                        contentStyle={{
-                          backgroundColor: "#1a1a1a",
-                          border: "1px solid #ffffff20",
-                          borderRadius: "8px",
-                        }}
+                        content={<CustomTooltip />}
+                        cursor={{ fill: "transparent" }}
                       />
                       <Bar dataKey="value" radius={[8, 8, 0, 0]}>
                         {comparisonData.map((entry, index) => (
@@ -431,68 +401,189 @@ const WhatIfSimulator = () => {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Quick Actions */}
-            <Card className="bg-black/50 border-white/10 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="text-white text-lg">
-                  Quick Scenarios
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <button
-                  onClick={() =>
-                    setFactors({
-                      traffic_volume: -30,
-                      congestion_index: -30,
-                      industrial_activity: 0,
-                      wind_speed: 0,
-                      temperature: 0,
-                      green_space_percentage: 0,
-                    })
-                  }
-                  className="w-full p-3 bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 text-sm font-medium transition-colors text-left"
-                >
-                  🚗 Reduce Traffic by 30%
-                </button>
-                <button
-                  onClick={() =>
-                    setFactors({
-                      traffic_volume: 0,
-                      congestion_index: 0,
-                      industrial_activity: -40,
-                      wind_speed: 0,
-                      temperature: 0,
-                      green_space_percentage: 0,
-                    })
-                  }
-                  className="w-full p-3 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-400 text-sm font-medium transition-colors text-left"
-                >
-                  🏭 Cut Industrial Emissions 40%
-                </button>
-                <button
-                  onClick={() =>
-                    setFactors({
-                      traffic_volume: 0,
-                      congestion_index: 0,
-                      industrial_activity: 0,
-                      wind_speed: 30,
-                      temperature: 0,
-                      green_space_percentage: 20,
-                    })
-                  }
-                  className="w-full p-3 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-cyan-400 text-sm font-medium transition-colors text-left"
-                >
-                  🌳 Increase Green Spaces + Wind
-                </button>
-              </CardContent>
-            </Card>
-          </div>
+          {/* RIGHT: Quick Scenario Buttons */}
+          <Card className="bg-black/50 border-white/10 backdrop-blur-xl">
+            <CardHeader>
+              <CardTitle className="text-white text-2xl">
+                Quick Policy Scenarios
+              </CardTitle>
+              <CardDescription className="text-white/60">
+                Test common policy interventions with one click
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <button
+                onClick={() =>
+                  setFactors({
+                    traffic_volume: -30,
+                    congestion_index: -30,
+                    industrial_activity: 0,
+                    wind_speed: 0,
+                    temperature: 0,
+                    green_space_percentage: 0,
+                  })
+                }
+                className="w-full p-5 bg-green-500/10 hover:bg-green-500/20 border-2 border-green-500/30 hover:border-green-500/50 rounded-xl text-left transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-green-500/20 rounded-lg group-hover:bg-green-500/30 transition-colors">
+                      <Car className="w-6 h-6 text-green-400" />
+                    </div>
+                    <div>
+                      <p className="text-green-400 font-bold text-lg">
+                        Reduce Traffic
+                      </p>
+                      <p className="text-white/60 text-sm">
+                        30% decrease in vehicle volume
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-green-400 font-bold text-2xl">-30%</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() =>
+                  setFactors({
+                    traffic_volume: 0,
+                    congestion_index: 0,
+                    industrial_activity: -40,
+                    wind_speed: 0,
+                    temperature: 0,
+                    green_space_percentage: 0,
+                  })
+                }
+                className="w-full p-5 bg-blue-500/10 hover:bg-blue-500/20 border-2 border-blue-500/30 hover:border-blue-500/50 rounded-xl text-left transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-blue-500/20 rounded-lg group-hover:bg-blue-500/30 transition-colors">
+                      <Factory className="w-6 h-6 text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-blue-400 font-bold text-lg">
+                        Cut Industrial Emissions
+                      </p>
+                      <p className="text-white/60 text-sm">
+                        40% reduction in factory output
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-blue-400 font-bold text-2xl">-40%</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() =>
+                  setFactors({
+                    traffic_volume: 0,
+                    congestion_index: 0,
+                    industrial_activity: 0,
+                    wind_speed: 30,
+                    temperature: 0,
+                    green_space_percentage: 20,
+                  })
+                }
+                className="w-full p-5 bg-cyan-500/10 hover:bg-cyan-500/20 border-2 border-cyan-500/30 hover:border-cyan-500/50 rounded-xl text-left transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-cyan-500/20 rounded-lg group-hover:bg-cyan-500/30 transition-colors">
+                      <Trees className="w-6 h-6 text-cyan-400" />
+                    </div>
+                    <div>
+                      <p className="text-cyan-400 font-bold text-lg">
+                        Green Infrastructure
+                      </p>
+                      <p className="text-white/60 text-sm">
+                        More parks + better wind flow
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-cyan-400 font-bold text-2xl">+20%</div>
+                </div>
+              </button>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Insights */}
+        {/* Factor Adjustment Sliders */}
+        <Card className="bg-black/50 border-white/10 backdrop-blur-xl">
+          <CardHeader>
+            <CardTitle className="text-white text-2xl">
+              Adjust Individual Factors
+            </CardTitle>
+            <CardDescription className="text-white/60">
+              Fine-tune each factor with precision control (-50% to +50%)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-8">
+              {factorConfigs.map((config) => {
+                const value = factors[config.key];
+                const IconComponent = config.icon;
+                return (
+                  <div
+                    key={config.key}
+                    className="space-y-4 p-4 rounded-xl bg-white/5 border border-white/10"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-blue-500/20 rounded-lg">
+                          <IconComponent className="w-5 h-5 text-blue-400" />
+                        </div>
+                        <div>
+                          <p className="text-white font-bold text-lg">
+                            {config.label}
+                          </p>
+                          <p className="text-white/40 text-xs">
+                            {config.description}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span
+                          className={`text-2xl font-bold ${
+                            value === 0
+                              ? "text-white/60"
+                              : value > 0
+                              ? "text-red-400"
+                              : "text-green-400"
+                          }`}
+                        >
+                          {value > 0 ? "+" : ""}
+                          {value}%
+                        </span>
+                      </div>
+                    </div>
+                    <Slider
+                      value={[value]}
+                      onValueChange={(val) =>
+                        handleFactorChange(config.key, val)
+                      }
+                      min={-50}
+                      max={50}
+                      step={5}
+                      className="cursor-pointer"
+                    />
+                    <div className="flex justify-between text-xs text-white/40 font-medium">
+                      <span>-50%</span>
+                      <span>0%</span>
+                      <span>+50%</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Policy Insight */}
         {Math.abs(pollutionChange) > 5 && (
           <Card className="bg-gradient-to-r from-purple-950/30 to-black border-purple-500/20">
             <CardContent className="pt-6">
@@ -501,35 +592,40 @@ const WhatIfSimulator = () => {
                   <Lightbulb className="w-6 h-6 text-purple-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white mb-2">
-                    Policy Insight
+                  <h3 className="text-xl font-bold text-white mb-3">
+                    Policy Recommendation
                   </h3>
-                  <p className="text-white/70">
+                  <p className="text-white/80 text-lg leading-relaxed">
                     {pollutionChange < -10 ? (
                       <>
-                        Your changes could reduce pollution by{" "}
+                        These interventions could reduce pollution by{" "}
                         <span className="text-green-400 font-bold">
-                          {Math.abs(pollutionChange).toFixed(1)} AQI points
+                          {Math.abs(pollutionChange).toFixed(1)} AQI points (
+                          {Math.abs(percentageChange).toFixed(1)}%)
                         </span>
-                        . This would improve air quality significantly and
-                        benefit public health.
+                        . This would significantly improve air quality and
+                        public health outcomes. Recommended for immediate
+                        implementation.
                       </>
                     ) : pollutionChange > 10 ? (
                       <>
                         Warning: These changes would increase pollution by{" "}
                         <span className="text-red-400 font-bold">
-                          {pollutionChange.toFixed(1)} AQI points
+                          {pollutionChange.toFixed(1)} AQI points (
+                          {percentageChange.toFixed(1)}%)
                         </span>
-                        . Consider mitigation strategies.
+                        . Additional mitigation strategies are required to
+                        offset negative impacts.
                       </>
                     ) : (
                       <>
-                        Your changes show a{" "}
+                        Current adjustments show a{" "}
                         <span className="text-blue-400 font-bold">
-                          {Math.abs(pollutionChange).toFixed(1)} AQI point
+                          {Math.abs(pollutionChange).toFixed(1)} AQI point (
+                          {Math.abs(percentageChange).toFixed(1)}%)
                         </span>{" "}
-                        shift. Try adjusting multiple factors for greater
-                        impact.
+                        change. Consider combining multiple interventions for
+                        greater impact.
                       </>
                     )}
                   </p>
