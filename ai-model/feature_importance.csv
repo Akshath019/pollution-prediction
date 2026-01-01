@@ -1,0 +1,14 @@
+feature,importance,importance_percentage
+traffic_volume,18.902618,38.652115
+congestion_index,8.07904,16.520037
+industrial_activity,5.310546,10.859015
+month,4.524489,9.251685
+wind_speed,4.314928,8.823174
+day_of_week,3.9345086,8.045291
+green_space_percentage,2.0094252,4.1088767
+is_weekend,0.6023983,1.2317853
+temperature,0.55888635,1.142812
+atmospheric_pressure,0.20568289,0.4205808
+hour,0.1884749,0.38539386
+precipitation,0.1660563,0.33955228
+is_rush_hour,0.10742421,0.21966125
