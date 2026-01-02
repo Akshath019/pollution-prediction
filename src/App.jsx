@@ -6,7 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Timeline from "./pages/Timeline";
 import FactorAttribution from "./pages/FactorAttribution";
 import WhatIfSimulator from "./pages/WhatIfSimulator";
-
+import ModelDocs from "./pages/ModelDocs";
 function App() {
   return (
     <Router>
@@ -49,6 +49,15 @@ function App() {
               <>
                 <Navbar />
                 <WhatIfSimulator />
+              </>
+            }
+          />
+          <Route
+            path="/model"
+            element={
+              <>
+                <Navbar />
+                <ModelDocs />
               </>
             }
           />

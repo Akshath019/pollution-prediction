@@ -1,6 +1,14 @@
 // src/components/layout/Navbar.jsx
 import { Link, useLocation } from "react-router-dom";
-import { Activity, BarChart3, Clock, Sliders, Menu, X } from "lucide-react";
+import {
+  Activity,
+  BarChart3,
+  Clock,
+  Sliders,
+  Menu,
+  X,
+  Brain,
+} from "lucide-react";
 import { useState } from "react";
 
 const Navbar = () => {
@@ -12,6 +20,7 @@ const Navbar = () => {
     { path: "/timeline", label: "Timeline", icon: Clock },
     { path: "/attribution", label: "Factor Attribution", icon: BarChart3 },
     { path: "/simulator", label: "What-If", icon: Sliders },
+    { path: "/model", label: "ML Model", icon: Brain },
   ];
 
   const isActive = (path) => {
