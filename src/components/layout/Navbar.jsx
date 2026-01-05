@@ -10,6 +10,7 @@ import {
   Brain,
 } from "lucide-react";
 import { useState } from "react";
+import { Bot } from "lucide-react";
 
 const Navbar = () => {
   const location = useLocation();
@@ -21,6 +22,7 @@ const Navbar = () => {
     { path: "/attribution", label: "Factor Attribution", icon: BarChart3 },
     { path: "/simulator", label: "What-If", icon: Sliders },
     { path: "/model", label: "ML Model", icon: Brain },
+    { path: "/chat", label: "AI Assistant", icon: Bot },
   ];
 
   const isActive = (path) => {

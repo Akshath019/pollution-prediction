@@ -7,6 +7,7 @@ import Timeline from "./pages/Timeline";
 import FactorAttribution from "./pages/FactorAttribution";
 import WhatIfSimulator from "./pages/WhatIfSimulator";
 import ModelDocs from "./pages/ModelDocs";
+import Chatbot from "./pages/Chatbot";
 function App() {
   return (
     <Router>
@@ -58,6 +59,15 @@ function App() {
               <>
                 <Navbar />
                 <ModelDocs />
+              </>
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <>
+                <Navbar />
+                <Chatbot />
               </>
             }
           />
