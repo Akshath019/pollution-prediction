@@ -45,7 +45,7 @@ const Navbar = () => {
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg md:text-xl font-bold text-white tracking-tight">
-                  Urban Pollution
+                  EcoSolutions
                 </h1>
                 <p className="text-[10px] md:text-xs text-white/50">
                   AI Prediction System

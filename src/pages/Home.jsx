@@ -35,9 +35,9 @@ const Home = () => {
               </div>
               <div>
                 <h1 className="text-lg font-bold text-white tracking-tight">
-                  Urban Pollution AI
+                  EcoSolutions
                 </h1>
-                <p className="text-xs text-white/50">Crackathon 2025</p>
+                <p className="text-xs text-white/50"></p>
               </div>
             </div>
 
@@ -252,8 +252,6 @@ const Home = () => {
                 <ArrowRight className="w-6 h-6" />
               </Link>
             </div>
-
-
           </div>
         </div>
       </div>
