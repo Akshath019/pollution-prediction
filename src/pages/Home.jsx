@@ -70,20 +70,16 @@ const Home = () => {
                   Pollution
                 </span>
               </h1>
-              <p className="text-2xl md:text-3xl font-light text-white/80 max-w-3xl mx-auto leading-relaxed">
-                48 Hours Ahead
-              </p>
+
             </div>
 
             {/* Subheadline */}
             <p className="max-w-3xl mx-auto text-lg md:text-xl text-white/60 leading-relaxed">
               AI-powered system using{" "}
-              <span className="text-blue-400 font-semibold">
-                XGBoost + SHAP
-              </span>{" "}
-              to predict urban pollution with{" "}
-              <span className="text-green-400 font-semibold">98% accuracy</span>{" "}
-              and show exactly which factors drive it.
+             
+              to predict urban pollution 
+               <span className="text-green-400 font-semibold"></span>{" "} 
+              and show which factors drive it.
             </p>
 
             {/* Stats Grid */}
@@ -151,9 +147,9 @@ const Home = () => {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-5xl md:text-6xl font-black text-white mb-4">
-                Why This{" "}
+                Our{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                  Wins
+                  Solution
                 </span>
               </h2>
               <p className="text-xl text-white/60 max-w-2xl mx-auto">
@@ -218,42 +214,7 @@ const Home = () => {
         </div>
 
         {/* Tech Stack & CTA */}
-        <div className="py-20 px-4 border-t border-white/10 bg-black/80 backdrop-blur-xl">
-          <div className="max-w-5xl mx-auto text-center space-y-12">
-            <div>
-              <p className="text-white/40 text-sm mb-6 uppercase tracking-widest">
-                Powered By
-              </p>
-              <div className="flex flex-wrap items-center justify-center gap-8 text-lg">
-                <span className="px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-white/80 font-medium">
-                  React + Vite
-                </span>
-                <span className="px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-white/80 font-medium">
-                  XGBoost ML
-                </span>
-                <span className="px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-white/80 font-medium">
-                  SHAP AI
-                </span>
-                <span className="px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg border border-blue-500/30 text-blue-400 font-bold">
-                  Firebase
-                </span>
-                <span className="px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-white/80 font-medium">
-                  Tailwind CSS
-                </span>
-              </div>
-            </div>
 
-            <div className="pt-8">
-              <Link
-                to="/dashboard"
-                className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-full font-black text-lg tracking-wide shadow-2xl shadow-blue-500/50 hover:scale-105 transition-all"
-              >
-                <span>Start Exploring</span>
-                <ArrowRight className="w-6 h-6" />
-              </Link>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
